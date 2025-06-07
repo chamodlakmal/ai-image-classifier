@@ -1,0 +1,87 @@
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="text-center mb-4">
+        <h1 class="display-4">AI Image Classifier</h1>
+        <p class="lead">
+          Upload an image and our AI will tell you what it sees!
+        </p>
+      </div>
+
+      @if(isLoading()){
+      <div class="alert alert-info" role="alert">
+        <div class="d-flex align-items-center">
+          <div
+            class="spinner-border spinner-border-sm me-2"
+            role="status"
+          ></div>
+          <span>Loading AI model... Please wait.</span>
+        </div>
+      </div>
+      } @if(errorMessage() || modelError()){
+      <div class="alert alert-danger" role="alert">
+        {{ errorMessage() || modelError() }}
+      </div>
+      }
+
+      <div class="card shadow-sm mb-4">
+        <div class="card-body">
+          <h5 class="card-title">Upload an Image</h5>
+          <div class="mb-3">
+            <input
+              type="file"
+              class="form-control"
+              accept="image/*"
+              (change)="onFileSelected($event)"
+            />
+          </div>
+          @if(imageSource()){
+          <div class="text-center mb-3">
+            <img
+              #imageElement
+              [src]="imageSource()"
+              class="img-fluid rounded"
+              style="max-height: 300px"
+              alt="Uploaded Image"
+            />
+          </div>
+          }
+        </div>
+      </div>
+      @if(predictions().length>0){
+      <div class="card shadow-sm mb-3">
+        <div class="card-body">
+          <h5 class="card-title mb-3">AI Analysis Results</h5>
+          @for( prediction of predictions() ; track $index){
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="fw-bold"> {{ prediction.className }}</span>
+            <span class="badge bg-success">
+              {{ getProbabiltyPercentage(prediction.probability) }}</span
+            >
+          </div>
+          <div class="progress" style="height: 10px">
+            <div
+              class="progress-bar bg-primary"
+              role="progressbar"
+              [style.width]="getProbabiltyPercentage(prediction.probability)"
+              [attr.aria-valuenow]="prediction.probability * 100"
+              aria-valuemin="0"
+              aria-valuemax="100"
+            ></div>
+          </div>
+          }
+        </div>
+      </div>
+      }
+      <div></div>
+      @if(isImageClassifing()){
+      <div class="text-center mt-4">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Analyzing Image...</span>
+        </div>
+        <p class="mt-2">Analyzing your image...</p>
+      </div>
+      }
+    </div>
+  </div>
+</div>
