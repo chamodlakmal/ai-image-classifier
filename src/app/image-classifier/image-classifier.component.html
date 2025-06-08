@@ -22,7 +22,7 @@
       <div class="alert alert-danger" role="alert">
         {{ errorMessage() || modelError() }}
       </div>
-      } @if(!isLoading() && !errorMessage() && !modelError()){
+      } @if(modelLoaded()){
       <div class="card shadow-sm mb-4">
         <div class="card-body">
           <h5 class="card-title">Upload an Image</h5>
