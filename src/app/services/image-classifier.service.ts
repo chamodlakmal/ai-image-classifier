@@ -22,27 +22,34 @@ export class ImageClassifierService {
     try {
       await tf.ready();
 
-      if (tf.getBackend() === null) {
+      // Try multiple backends in order of preference
+      const backends = ['webgl', 'wasm', 'cpu'];
+      let backendSet = false;
+
+      for (const backend of backends) {
         try {
-          await tf.setBackend('webgl');
-          console.log('TensorFlow.js backend set to WebGL');
+          await tf.setBackend(backend);
+          console.log(`TensorFlow.js backend set to ${backend}`);
+          backendSet = true;
+          break;
         } catch (error) {
-          console.error('Error setting TensorFlow.js backend:', error);
-          this.modelError.set(
-            'Failed to set TensorFlow.js backend. Please try again later.'
-          );
-          return;
+          console.warn(`Failed to set ${backend} backend:`, error);
         }
-      } else {
-        console.log('Using existing TensorFlow.js backend:', tf.getBackend());
       }
 
+      if (!backendSet) {
+        this.modelError.set(
+          'Failed to initialize TensorFlow.js backend on your device.'
+        );
+        return;
+      }
       this.model = await mobileNet.load();
+
       this.modelLoaded.set(true);
       console.log('Model loaded successfully');
     } catch (error) {
       console.error('Error loading model:', error);
-      this.modelError.set('Failed to load model. Please try again later.');
+      this.modelError.set('Failed to load model');
     } finally {
       this.isLoading.set(false);
     }
